@@ -6,7 +6,7 @@ import './App.css';
 const MomentDate = () => {
   const dateToFormat = new Date();
   return (
-    <Moment>{dateToFormat}</Moment>
+    <p><Moment>{dateToFormat}</Moment></p>
   );  
 }
 
