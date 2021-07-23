@@ -21,8 +21,8 @@ function App() {
   const [btnDisable, setDisable] = useState(false);
 
   useEffect(()=>{
-    setTotal(localStorage.getItem("totalAmount"));
-    setData(JSON.parse(localStorage.getItem("cashbookData")));
+    setTotal(localStorage.getItem("totalAmount") || 0);
+    setData(JSON.parse(localStorage.getItem("cashbookData")) || []);
   }, []);
 
   useEffect(()=>{
