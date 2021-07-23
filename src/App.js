@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Moment from 'react-moment';
 import './App.css';
 
@@ -12,7 +12,6 @@ const MomentDate = () => {
 
 
 function App() {
-
   const [open, setOpen] = useState(false);
   const [btnType, setType] = useState("IN");
   const [amt, setAmt] = useState(0);
@@ -20,6 +19,16 @@ function App() {
   const [totalAmt, setTotal] = useState(0);
   const [data, setData] = useState([]);
   const [btnDisable, setDisable] = useState(false);
+
+  useEffect(()=>{
+    setTotal(localStorage.getItem("totalAmount"));
+    setData(JSON.parse(localStorage.getItem("cashbookData")));
+  }, []);
+
+  useEffect(()=>{
+    localStorage.setItem("totalAmount", totalAmt);
+    localStorage.setItem("cashbookData", JSON.stringify(data));
+  });
 
   const openModel = (e, type) => {
     e.preventDefault();
