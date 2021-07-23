@@ -119,7 +119,7 @@ function App() {
       </div>
       {open ? <div className="model">
             <div className="model-content">
-                <p>New Enrty</p>
+                <p>New Entry</p>
                 <input type="text" placeholder="INR 0.00"  data-testid="amount" onChange={(e)=>getAmount(e)}></input>
                 <textarea placeholder="Entry Note"  data-testid="note" onChange={(e)=>getText(e)} />
                 {btnType === "IN" ? 
