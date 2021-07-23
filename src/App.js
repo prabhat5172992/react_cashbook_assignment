@@ -6,7 +6,7 @@ import './App.css';
 
 
 const MomentDate = () => {
-  const dateToFormat = '1976-04-19T12:59-0500';
+  const dateToFormat = new Date();
   return (
     <Moment>{dateToFormat}</Moment>
   );  
