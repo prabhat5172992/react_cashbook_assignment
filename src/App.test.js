@@ -5,7 +5,7 @@ import {
   getByText,
   getByTestId,
   queryByTestId,
-} from '@testing-library/dom';
+} from '@testing-library/react';
 
 import { rest } from 'msw'
 import userEvent from '@testing-library/user-event'
@@ -20,6 +20,13 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
+test('to validate the zero balance', async () => {
+
+  render(<App />);
+  await waitFor(() =>
+    expect(screen.getByTestId('balance')).toHaveTextContent('₹ 0.00')
+  )
+});
 
 test('document should contain my cashbook', () => {
   render(<App />);
@@ -27,7 +34,10 @@ test('document should contain my cashbook', () => {
   expect(bookingElement).toBeInTheDocument();
 });
 
-
+test('document should contain no entry found', () => {
+  render(<App />);
+  expect(screen.getByTestId('no-entry-found').textContent).toBe("No Entry Found!")
+});
 
 test('create a entry for cash-in', async () => {
 
@@ -45,20 +55,14 @@ test('create a entry for cash-in', async () => {
 
   const createbtn = screen.getByTestId('create-entry-btn')
 
-
   expect(createbtn.disabled).toBe(false)
 
   fireEvent.click(screen.getByTestId('create-entry-btn'))
-
-
 });
-
 
 test('create a entry for cash-out', async () => {
 
   render(<App />);
-
-  expect(screen.getByText(/No Entry Found!/i)).toBeInTheDocument();
 
   fireEvent.click(screen.getByTestId('cashout-btn'))
 
@@ -75,17 +79,5 @@ test('create a entry for cash-out', async () => {
   expect(createbtn.disabled).toBe(false)
 
   fireEvent.click(screen.getByTestId('create-entry-btn'))
-
-
 });
 
-
-test('test to validate the zero balance', async () => {
-
-  render(<App />);
-
-  await waitFor(() =>
-    expect(screen.getByTestId('balance')).toHaveTextContent(/0 INR/i)
-  )
-
-});

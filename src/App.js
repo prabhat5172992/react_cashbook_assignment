@@ -3,10 +3,9 @@ import Moment from 'react-moment';
 import './App.css';
 
 
-const MomentDate = () => {
-  const dateToFormat = new Date();
+const MomentDate = ({time}) => {
   return (
-    <p><Moment>{dateToFormat}</Moment></p>
+    <p><Moment>{time}</Moment></p>
   );  
 }
 
@@ -21,13 +20,22 @@ function App() {
   const [btnDisable, setDisable] = useState(false);
 
   useEffect(()=>{
-    setTotal(localStorage.getItem("totalAmount") || 0);
-    setData(JSON.parse(localStorage.getItem("cashbookData")) || []);
+    setTotal(parseFloat(localStorage.getItem("totalAmount")) || 0);
+    if(localStorage.getItem("cashbookData")) {
+      setData(JSON.parse(localStorage.getItem("cashbookData")) || []);
+    }
+
+    if(document.body.clientHeight < (window.innerHeight - 50)) {
+      document.getElementById('footer_btn').style.position = "fixed";
+    }
   }, []);
 
   useEffect(()=>{
     localStorage.setItem("totalAmount", totalAmt);
     localStorage.setItem("cashbookData", JSON.stringify(data));
+    if(document.body.clientHeight > (window.innerHeight - 50)) {
+      document.getElementById('footer_btn').style.position = "sticky";
+    }
   });
 
   const openModel = (e, type) => {
@@ -61,17 +69,18 @@ function App() {
     e.preventDefault();
     const obj = {};
     if(amt && text) {
+      obj["time"] = new Date();
       if(type === "IN") {
         obj["text"] = text;
         obj["inAmount"] = amt;
         setData(ar => [...ar, obj]);
-        setTotal(amount => amount + amt);
+        setTotal(amount => parseFloat(amount) + parseFloat(amt));
       }
-      if(type === "OUT") {
+      if(type === "OUT" && totalAmt >= amt) {
         obj["text"] = text;
-        obj["outAmount"] = totalAmt >= amt ? amt : null;
+        obj["outAmount"] = amt;
         setData(ar => [...ar, obj]);
-        setTotal(amount => amount - amt);
+        setTotal(amount => parseFloat(amount) - parseFloat(amt));
       }
       setOpen(false);
     }
@@ -81,16 +90,16 @@ function App() {
     return data.map((item, index) => 
     <div className="wrap" key={`key_${index}${item.text}`}>
       <div className="first">
-        <MomentDate />
+        <MomentDate time={item.time} />
         <p>{item.text}</p>
       </div>
       <div className="out">
         <p>Out</p>
-        {item.outAmount ? <p>{`INR ${item.outAmount}`}</p> : <p>-</p>}
+        {item.outAmount ? <p>{`₹ ${item.outAmount.toFixed(2)}`}</p> : <p>-</p>}
       </div>
       <div className="in">
         <p>In</p>
-        {item.inAmount ? <p>{`INR ${item.inAmount}`}</p> : <p>-</p>}
+        {item.inAmount ? <p>{`₹ ${item.inAmount.toFixed(2)}`}</p> : <p>-</p>}
       </div>
     </div>)
   }
@@ -100,7 +109,7 @@ function App() {
       <div>
         <h1 className="Heading">My Cashbook</h1>
         <div className="today-balance">
-          <h1 data-testid="balance">{`${totalAmt} INR`}</h1>
+          <h1 data-testid="balance">{`₹ ${totalAmt.toFixed(2)}`}</h1>
           <p>Today's Balance</p>
         </div>
       </div>
@@ -110,17 +119,17 @@ function App() {
           {displayRow()}
         </div>:
         <div className="entry">
-          <h1>No Entry Found!</h1>
+          <h1 data-testid="no-entry-found">No Entry Found!</h1>
         </div>}
       </div>
-      <div className="action-group">
+      <div id="footer_btn" className="action-group">
         <button className="red"  data-testid="cashout-btn" onClick={(e)=>openModel(e, "OUT")}>Out</button>
         <button className="green"  data-testid="cashin-btn" onClick={(e)=>openModel(e, "IN")}>IN</button>
       </div>
       {open ? <div className="model">
             <div className="model-content">
                 <p>New Entry</p>
-                <input type="text" placeholder="INR 0.00"  data-testid="amount" onChange={(e)=>getAmount(e)}></input>
+                <input type="text" placeholder="₹ 0.00"  data-testid="amount" onChange={(e)=>getAmount(e)}></input>
                 <textarea placeholder="Entry Note"  data-testid="note" onChange={(e)=>getText(e)} />
                 {btnType === "IN" ? 
                   <button 
